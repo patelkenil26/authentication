@@ -6,8 +6,8 @@ class RegisterDto extends BaseDto {
     name: Joi.string().trim().min(2).max(50).required(),
     email: Joi.string().email().lowercase().required(),
     password: Joi.string()
-      .message("Password must contain 8 chars minimum")
       .min(8)
+      .message("Password must contain 8 chars minimum")
       .required(),
     role: Joi.string().valid("customer", "seller").default("customer"),
   });
