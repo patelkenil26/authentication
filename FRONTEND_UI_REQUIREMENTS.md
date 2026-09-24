@@ -13,7 +13,8 @@ This document outlines the exact pages and UI components required for a highly s
 
 ---
 
-## 📱 Required Pages & Screens
+## 📱 Phase 1: Ready to Build (Backend 100% Complete)
+*These screens have fully functional backend APIs ready to be connected.*
 
 ### 1. Login Page (`/login`)
 *The main gateway for users.*
@@ -66,25 +67,7 @@ This document outlines the exact pages and UI components required for a highly s
   - "Allow Access" (Primary, Green/Blue)
   - "Deny" (Secondary/Outline, Red/Grey)
 
-### 6. Developer Portal / App Registration (`/developer`)
-*Where third-party developers register their apps to get API keys.*
-- **Header**: "Developer Settings" or "Register New Client".
-- **Form**: Input for `App Name` and `Redirect URIs`.
-- **Credentials View**: After registration, a secure UI showing the generated `Client ID` and `Client Secret` (with a 'copy to clipboard' button and a blur effect to hide the secret until clicked).
-
-### 7. API Documentation Page (`/docs`)
-*A beautiful docs page for developers integrating this Auth system.*
-- **Layout**: Sidebar with navigation links, main content area with code snippets.
-- **Sections**: "Getting Started", "OAuth 2.0 Flow", "Endpoints".
-- **Code Blocks**: Syntax-highlighted code snippets for cURL, Node.js, etc., explaining how to call `/o/authorize` and `/o/token`.
-
-### 8. Admin Console (`/admin/users`)
-*For the super-admins to manage the platform (Auth0 style user-management).*
-- **Layout**: Sidebar dashboard (Analytics, Users, Clients).
-- **Users Table**: A data table listing all registered users with their `Avatar`, `Name`, `Email`, `Role`, and `Status` (Verified/Unverified).
-- **Actions**: Three-dot menu on each row to "Block User", "Reset Password", or "Delete Account".
-
-### 9. Email Verification Status (`/verify`)
+### 6. Email Verification Status (`/verify`)
 *An extremely premium, "Google-level" user experience for when a user clicks the email link.*
 - **Layout**: A beautiful split-screen or large elevated card with premium SVG illustrations.
 - **Success State (Magic UX)**: 
@@ -93,6 +76,40 @@ This document outlines the exact pages and UI components required for a highly s
 - **Error State (Expired/Invalid)**: 
   - A sleek, non-intimidating error illustration.
   - **Smart Recovery**: Don't just show an error. Automatically show an input field pre-filled with their email and a "Send New Magic Link" button so they don't hit a dead end.
+
+### 7. API Documentation Page (`/docs`)
+*A beautiful docs page for developers integrating this Auth system. (No backend needed)*
+- **Layout**: Sidebar with navigation links, main content area with code snippets.
+- **Sections**: "Getting Started", "OAuth 2.0 Flow", "Endpoints".
+- **Code Blocks**: Syntax-highlighted code snippets for cURL, Node.js, etc., explaining how to call `/o/authorize` and `/o/token`.
+
+---
+
+## 🚀 Phase 2: Future UI Roadmap (Backend Pending)
+*These screens are for future advanced features. Their backend APIs have not been written yet.*
+
+### 8. Developer Portal / App Registration (`/developer`)
+*Where third-party developers register their apps to get API keys.*
+- **Header**: "Developer Settings" or "Register New Client".
+- **Form**: Input for `App Name` and `Redirect URIs`.
+- **Credentials View**: Secure UI showing generated `Client ID` and `Client Secret`.
+
+### 9. Admin Console (`/admin/users`)
+*For the super-admins to manage the platform (Auth0 style user-management).*
+- **Layout**: Sidebar dashboard (Analytics, Users, Clients).
+- **Users Table**: A data table listing all registered users with their `Avatar`, `Name`, `Email`, `Role`, and `Status` (Verified/Unverified).
+- **Actions**: Three-dot menu on each row to "Block User", "Reset Password", or "Delete Account".
+
+### 10. Multi-Factor Authentication (2FA) Flow (`/mfa`)
+*For future-proofing enterprise security.*
+- **Setup Screen**: A clean UI showing a QR Code to scan with Google Authenticator, a "Copy Secret Key" button, and an input for the 6-digit verification code.
+- **Verification Screen (Login Step 2)**: A focused, minimalist input (6 individual boxes) that auto-advances when the 6th digit is typed, asking for the TOTP code to complete login.
+- **Recovery Codes**: A secure modal showing 10 backup codes with a "Download as PDF" button.
+
+### 11. Security & Device Management (`/dashboard/security`)
+*A dedicated dashboard tab giving users ultimate control over their account.*
+- **Active Sessions View**: A list showing devices (e.g., "💻 Chrome on Windows 11" and "📱 Safari on iPhone") with their IP location and last active time.
+- **Remote Logout**: A red "Revoke" button next to each session, and a global "Log out of all other devices" button.
 
 ---
 
