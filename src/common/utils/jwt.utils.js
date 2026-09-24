@@ -49,9 +49,9 @@ const generateOidcIdToken = (userId, clientId) => {
   )
 }
 
-const generateOidcAccessToken = (userId, clientId) => {
+const generateOidcAccessToken = (userId, clientId, scope) => {
   return jwt.sign(
-    { sub: userId, client_id: clientId },
+    { sub: userId, client_id: clientId, scope },
     PRIVATE_KEY,
     { algorithm: "RS256", expiresIn: "1h", issuer }
   );

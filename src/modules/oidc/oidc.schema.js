@@ -10,3 +10,11 @@ export const clientsTable = pgTable("clients", {
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export const consentsTable = pgTable("consents", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull(),
+  clientId: varchar("client_id", { length: 255 }).notNull(),
+  scopes: varchar("scopes", { length: 255 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

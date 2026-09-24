@@ -120,16 +120,33 @@ export const tokenController = async (req, res, next) => {
 export const userInfoController = async (req, res, next) => {
   try {
     const userId = req.oidcUser.sub;
+    const grantedScopes = req.oidcUser.scope || "";
     const user = await authService.getMe(userId);
 
-    res.status(200).json({
+    const responseData = {
       sub: user.id,
-      name: user.name,
-      email: user.email,
-      email_verified: true,
-    })
+    };
+
+    if (grantedScopes.includes("profile")) {
+      responseData.name = user.name;
+    }
+
+    if (grantedScopes.includes("email")) {
+      responseData.email = user.email;
+      responseData.email_verified = true;
+    }
+
+    res.status(200).json(responseData);
   } catch (error) {
     next(ApiError.badRequest(error.message));
   }
 }
 
+export const revokeController = async (req, res, next) => {
+  try {
+    await revokeToken(req.body.token);
+    res.status(200).send();
+  } catch (error) {
+    next(ApiError.badRequest(error.message));
+  }
+}

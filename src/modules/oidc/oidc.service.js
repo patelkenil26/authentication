@@ -1,15 +1,12 @@
 import crypto from "crypto";
 import { db } from "../../common/config/db.js";
-import { clientsTable } from "./oidc.schema.js";
+import { clientsTable, consentsTable } from "./oidc.schema.js";
 import ApiError from "../../common/utils/api-error.js";
 import { eq } from "drizzle-orm";
 import * as authService from "../auth/auth.service.js";
 import { generateOidcAccessToken, generateOidcIdToken, generateOidcRefreshToken } from "../../common/utils/jwt.utils.js";
 
-// Memory Map jisme hum 1 minute ke liye Code save karenge (Future me ise Redis me dalenge)
-export const authCodes = new Map();
-
-export const refreshTokens = new Map(); // Refresh Tokens save karne ke liye
+import redis from "../../common/config/redis.js";
 
 
 const registerClient = async ({ displayName, applicationUrl, redirectUri }) => {
@@ -53,21 +50,32 @@ const verifyClientForAuthorization = async (clientId, redirectUri) => {
 };
 
 const generateAuthorizationCode = async ({
-  email, password, client_id, redirect_uri, state, code_challenge, code_challenge_method
+  email, password, client_id, redirect_uri, state, code_challenge, code_challenge_method, scope, consent_granted
 }) => {
   const client = await verifyClientForAuthorization(client_id, redirect_uri)
 
+  if (!consent_granted) {
+    throw ApiError.unauthorized("User denied the consent request");
+  }
+
   const { user } = await authService.login({ email, password })
+
+  await db.insert(consentsTable).values({
+    userId: user.id,
+    clientId: client_id,
+    scopes: scope,
+  }).onConflictDoNothing();
 
   const code = crypto.randomBytes(16).toString("hex");
   const expiresAt = Date.now() + 1 * 60 * 1000;
 
-  authCodes.set(code, {
+  await redis.set(`auth_code:${code}`, JSON.stringify({
     userId: user.id,
+    scope,
     expiresAt,
     code_challenge,
     code_challenge_method,
-  });
+  }), "EX", 60); // 60 seconds TTL
 
   return { code, redirectUri: client.redirectUri, state };
 }
@@ -78,30 +86,40 @@ const exchangeCodeForToken = async ({ code, client_id, client_secret, redirect_u
   if (client_secret && client.clientSecret !== client_secret) {
     throw ApiError.unauthorized("Invalid client_secret");
   }
-  const codeData = authCodes.get(code);
+  const codeDataStr = await redis.get(`auth_code:${code}`);
 
-  if (!codeData) {
+  if (!codeDataStr) {
     throw ApiError.unauthorized("Invalid or expired authorization code");
   }
 
+  const codeData = JSON.parse(codeDataStr);
+
   if (Date.now() > codeData.expiresAt) {
-    authCodes.delete(code); // Delete expired code
+    await redis.del(`auth_code:${code}`);
     throw ApiError.unauthorized("Authorization code has expired");
   }
 
   // TODO: Yahan hum aage chalkar PKCE (code_verifier) check karenge
 
-  authCodes.delete(code);
+  await redis.del(`auth_code:${code}`);
 
   const idToken = generateOidcIdToken(codeData.userId, client_id)
 
-  const accessToken = generateOidcAccessToken(codeData.userId, client_id)
+  const accessToken = generateOidcAccessToken(codeData.userId, client_id, codeData.scope)
 
   const refreshToken = generateOidcRefreshToken();
 
-  refreshTokens.set(refreshToken, { userId: codeData.userId, clientId: client_id });
+  await redis.set(`oidc_refresh_token:${refreshToken}`, JSON.stringify({ 
+    userId: codeData.userId, 
+    clientId: client_id 
+  }), "EX", 7 * 24 * 60 * 60); // 7 days TTL
 
   return { idToken, accessToken, refreshToken }
 
 }
-export { registerClient, verifyClientForAuthorization, generateAuthorizationCode, exchangeCodeForToken };
+
+const revokeToken = async (token) => {
+  await redis.del(`oidc_refresh_token:${token}`);
+  return true;
+}
+export { registerClient, verifyClientForAuthorization, generateAuthorizationCode, exchangeCodeForToken, revokeToken };

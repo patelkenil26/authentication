@@ -19,3 +19,11 @@ export const userTable = pgTable("users", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
+
+export const oauthAccountsTable = pgTable("oauth_accounts", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").notNull().references(() => userTable.id, { onDelete: 'cascade' }),
+    provider: varchar("provider", { length: 50 }).notNull(), // e.g., 'google', 'github'
+    providerAccountId: varchar("provider_account_id", { length: 255 }).notNull(), // Google ka unique ID
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+})

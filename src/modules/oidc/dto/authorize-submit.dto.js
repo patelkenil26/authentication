@@ -5,6 +5,8 @@ class AuthorizeSubmitDto extends BaseDto {
     static schema = Joi.object({
         email: Joi.string().email().required(),
         password: Joi.string().required(),
+        
+        consent_granted: Joi.boolean().required(),
 
         // hidden params
         client_id: Joi.string().required(),

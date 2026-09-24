@@ -6,11 +6,13 @@ import RegisterDto from "./dto/register.dto.js";
 import LoginDto from "./dto/login.dto.js";
 import ForgotPasswordDto from "./dto/forgot-password.dto.js";
 import ResetPasswordDto from "./dto/reset-password.dto.js";
+import providersRoutes from "./providers/providers.routes.js";
+import { authLimiter } from "../../common/middleware/rate-limiter.middleware.js";
 
 const router = Router();
 
-router.post("/register", validate(RegisterDto), controller.register);
-router.post("/login", validate(LoginDto), controller.login);
+router.post("/register", authLimiter, validate(RegisterDto), controller.register);
+router.post("/login", authLimiter, validate(LoginDto), controller.login);
 router.post("/refresh-token", controller.refreshToken);
 router.post("/logout", authenticate, controller.logout);
 router.get("/verify-email/:token", controller.verifyEmail);
@@ -25,5 +27,8 @@ router.put(
   controller.resetPassword,
 );
 router.get("/me", authenticate, controller.getMe);
+
+router.use("/providers", authLimiter, providersRoutes);
+
 
 export default router;
