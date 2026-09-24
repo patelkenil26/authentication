@@ -1,5 +1,6 @@
 import Joi from "joi";
 import BaseDto from "../../../common/dto/base.dto.js";
+import { ROLES } from "../../../common/constants/roles.constant.js";
 
 class RegisterDto extends BaseDto {
   static schema = Joi.object({
@@ -9,7 +10,7 @@ class RegisterDto extends BaseDto {
       .min(8)
       .message("Password must contain 8 chars minimum")
       .required(),
-    role: Joi.string().valid("customer", "seller").default("customer"),
+    role: Joi.string().valid(ROLES.CUSTOMER, ROLES.SELLER).default(ROLES.CUSTOMER),
   });
 }
 
