@@ -7,13 +7,23 @@ This document tracks all the future implementation plans, security optimizations
 - **Database Isolation**: The PostgreSQL database MUST NOT be accessible from the public internet. It should be placed in a private network (VPC) where only the backend server can communicate with it.
 - **Secrets Management**: Double-check that `.env` is in `.gitignore`. Use proper Environment Variables injection on the hosting provider (Render, AWS, Vercel, Railway).
 - **Monitoring & Logging (Bonus)**: Add a logging tool (like Winston or Datadog) to track failed login attempts, API crashes, and unusual traffic patterns.
-
+- **Email Service (Resend) Verification**: 
+  - **Development Phase**: Currently on the free tier. Without a verified domain, emails can ONLY be sent to the registered Resend email address (sender appears as `onboarding@resend.dev`).
+  - **Production Phase**: Before going live, MUST verify the custom production domain (e.g., `auth.yourdomain.com`) via DNS records in the Resend Dashboard. Once verified, emails can be sent to any external user (e.g., `noreply@yourdomain.com`).
 ## 2. High Priority / Immediate Next Steps (Pending)
 These tasks must be completed before launching the backend to production:
 - **Role-Based Access Control (RBAC) Middleware**: **[CRITICAL]** Create an `authorizeRole(['admin'])` middleware to protect sensitive routes (like the upcoming Admin Console APIs) from unauthorized access.
 - **Dynamic Client Registration API (Developer Portal)**: **[CRITICAL]** Build the `POST /api/clients/register` API allowing third-party developers to dynamically register their apps and securely receive a `client_id` and `client_secret`.
 - **Real Email Provider Integration**: Replace console logs with a real email service (like Resend, SendGrid, or Nodemailer) to send actual "Verify Email" and "Reset Password" links to users.
 - **Additional Social Providers**: Expand the `/providers` architecture by adding `github.provider.js` and `linkedin.provider.js` to offer users more login options.
+
+## 3. Future Template Requirements (For Phase 2 Features)
+As we implement the advanced "Identity Platform" features in Phase 2, we must ensure we build the corresponding templates to maintain modularity in the `src/common/templates/` folder:
+- **Magic Link Emails (`magic-link.email.js`)**: Required when we build the Passwordless Auth feature.
+- **2FA SMS/Email (`otp.sms.js` & `otp.email.js`)**: Required when we implement Multi-Factor Authentication (MFA).
+- **Webhook Payloads (`events.webhook.js`)**: Required when we build the B2B Management API to dispatch real-time events (`user.created`, `user.deleted`) to third-party developers.
+- **OIDC Fallback Error Pages (`error.page.js`)**: Required for handling invalid `client_id` or `redirect_uri` scenarios where the backend cannot safely redirect back to the client.
+- **Admin/Security Audit Alerts (`audit.email.js`)**: Alerts sent to Admin Console users for suspicious activities or monthly MAU reports.
 
 ## 4. Future "Identity Platform" Features (Auth0/Clerk Level)
 The following advanced features are tracked for future phases to evolve ChaiAuth into a full-scale Billion-Dollar Identity Platform:

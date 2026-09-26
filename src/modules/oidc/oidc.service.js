@@ -9,7 +9,7 @@ import { generateOidcAccessToken, generateOidcIdToken, generateOidcRefreshToken 
 import redis from "../../common/config/redis.js";
 
 
-const registerClient = async ({ displayName, applicationUrl, redirectUri }) => {
+const registerClient = async ({ developerId, displayName, applicationUrl, redirectUri }) => {
   // 1 generate client id
   const clientId = crypto.randomBytes(16).toString("hex");
 
@@ -20,6 +20,7 @@ const registerClient = async ({ displayName, applicationUrl, redirectUri }) => {
   const [newClient] = await db
     .insert(clientsTable)
     .values({
+      developerId,
       clientId,
       clientSecret,
       displayName,
@@ -122,4 +123,22 @@ const revokeToken = async (token) => {
   await redis.del(`oidc_refresh_token:${token}`);
   return true;
 }
-export { registerClient, verifyClientForAuthorization, generateAuthorizationCode, exchangeCodeForToken, revokeToken };
+
+const getDeveloperClients = async (developerId) => {
+  const clients = await db
+    .select({
+      id: clientsTable.id,
+      clientId: clientsTable.clientId,
+      // Intentionally NOT selecting clientSecret for security on the list page
+      displayName: clientsTable.displayName,
+      applicationUrl: clientsTable.applicationUrl,
+      redirectUri: clientsTable.redirectUri,
+      createdAt: clientsTable.createdAt,
+    })
+    .from(clientsTable)
+    .where(eq(clientsTable.developerId, developerId));
+    
+  return clients;
+};
+
+export { registerClient, getDeveloperClients, verifyClientForAuthorization, generateAuthorizationCode, exchangeCodeForToken, revokeToken };

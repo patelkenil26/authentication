@@ -1,7 +1,9 @@
 import { pgTable, uuid, varchar, timestamp } from "drizzle-orm/pg-core";
+import { userTable } from "../auth/auth.schema.js";
 
 export const clientsTable = pgTable("clients", {
   id: uuid("id").primaryKey().defaultRandom(),
+  developerId: uuid("developer_id").notNull().references(() => userTable.id, { onDelete: 'cascade' }),
   clientId: varchar("client_id", { length: 255 }).notNull().unique(),
   clientSecret: varchar("client_secret", { length: 255 }).notNull(),
   displayName: varchar("display_name", { length: 255 }).notNull(),

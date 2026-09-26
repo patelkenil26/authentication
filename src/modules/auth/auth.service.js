@@ -10,6 +10,8 @@ import {
 import {
   sendVerificationEmail,
   sendResetPasswordEmail,
+  sendWelcomeEmail,
+  sendPasswordChangedEmail
 } from "../../common/config/email.js";
 import { eq, and, gt } from "drizzle-orm";
 import { db } from "../../common/config/db.js";
@@ -138,6 +140,12 @@ const verifyEmail = async (token) => {
     .set({ isVerified: true, verificationToken: null })
     .where(eq(userTable.id, user.id));
 
+  try {
+    await sendWelcomeEmail(user.email, user.name);
+  } catch (err) {
+    console.error("Failed to send welcome email:", err.message);
+  }
+
   return user;
 };
 
@@ -181,6 +189,12 @@ const resetPassword = async (token, newPassword) => {
     .update(userTable)
     .set({ password: hashedPassword, resetPasswordToken: null, resetPasswordExpires: null })
     .where(eq(userTable.id, user.id));
+
+  try {
+    await sendPasswordChangedEmail(user.email);
+  } catch (err) {
+    console.error("Failed to send password changed alert:", err.message);
+  }
 };
 
 const getMe = async (userId) => {

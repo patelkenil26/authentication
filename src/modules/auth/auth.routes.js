@@ -13,16 +13,18 @@ const router = Router();
 
 router.post("/register", authLimiter, validate(RegisterDto), controller.register);
 router.post("/login", authLimiter, validate(LoginDto), controller.login);
-router.post("/refresh-token", controller.refreshToken);
+router.post("/refresh-token", authLimiter, controller.refreshToken);
 router.post("/logout", authenticate, controller.logout);
 router.get("/verify-email/:token", controller.verifyEmail);
 router.post(
   "/forgot-password",
+  authLimiter,
   validate(ForgotPasswordDto),
   controller.forgotPassword,
 );
 router.put(
   "/reset-password/:token",
+  authLimiter,
   validate(ResetPasswordDto),
   controller.resetPassword,
 );

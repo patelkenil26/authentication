@@ -4,6 +4,7 @@ import {
   exchangeCodeForToken,
   generateAuthorizationCode,
   registerClient,
+  getDeveloperClients,
   verifyClientForAuthorization,
 } from "./oidc.service.js";
 import ApiResponse from "../../common/utils/api-response.js";
@@ -34,18 +35,46 @@ export const getJwks = async (req, res) => {
   }
 };
 
+import { sendDeveloperAppRegisteredEmail } from "../../common/config/email.js";
+
 export const registerClientController = async (req, res, next) => {
   try {
-    const clientData = await registerClient(req.body);
+    // Both Admin and Developer routes are authenticated, so req.user.id is guaranteed
+    const payload = {
+      ...req.body,
+      developerId: req.user.id,
+    };
 
-    ApiResponse.created(res, "Client Register Successfully", {
+    const clientData = await registerClient(payload);
+    
+    // Fetch user to get their email address, then send confirmation email
+    try {
+      const user = await authService.getMe(req.user.id);
+      await sendDeveloperAppRegisteredEmail(user.email, clientData.displayName, clientData.clientId);
+    } catch (err) {
+      console.error("Failed to send app registration email:", err.message);
+    }
+
+    ApiResponse.created(res, "Client Registered Successfully", {
       clientId: clientData.clientId,
       clientSecret: clientData.clientSecret,
       displayName: clientData.displayName,
+      applicationUrl: clientData.applicationUrl,
       redirectUri: clientData.redirectUri,
     });
   } catch (error) {
     next(ApiError.internal("Failed to register client"));
+  }
+};
+
+export const getDeveloperClientsController = async (req, res, next) => {
+  try {
+    const developerId = req.user.id;
+    const clients = await getDeveloperClients(developerId);
+    
+    ApiResponse.ok(res, "Developer clients fetched successfully", clients);
+  } catch (error) {
+    next(ApiError.internal("Failed to fetch clients"));
   }
 };
 
