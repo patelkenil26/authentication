@@ -15,7 +15,7 @@ Built an "Enterprise-Grade" OAuth2/OIDC Provider to allow third-party apps (like
 - **Asymmetric Cryptography**: Implemented RSA 2048-bit Public/Private key pairs for signing and verifying tokens securely.
 - **Discovery Endpoint** (`GET /.well-known/openid-configuration`): Publishes OIDC metadata.
 - **JWKS Endpoint** (`GET /.well-known/jwks.json`): Serves the Public Key for clients to verify `id_token` signatures.
-- **Client Registration** (`POST /admin/register-client`): Registers third-party apps and generates `client_id` and `client_secret`.
+- **Developer Portal** (`POST /developer/clients`, `GET /developer/clients`): Allows third-party developers to register their apps, generating `client_id` and `client_secret`, and listing their registered apps.
 - **Authorize Endpoint** (`GET & POST /o/authorize`): Handles user login/consent, verifies PKCE (`code_challenge`), `state`, `redirect_uri`, and generates a short-lived Authorization Code.
 - **Token Endpoint** (`POST /o/token`): Exchanges the Authorization Code for RS256-signed `id_token`, `access_token`, and `refresh_token`.
 - **Revoke Endpoint** (`POST /o/revoke`): Invalidates an active token by removing it from Redis.
@@ -40,7 +40,16 @@ Built an "Enterprise-Grade" OAuth2/OIDC Provider to allow third-party apps (like
 - **HTTP Security Headers**: Integrated **Helmet.js** to prevent XSS, Clickjacking, and other injection vulnerabilities.
 - **CORS Configuration**: Restricted cross-origin resource sharing to only the allowed frontend domain.
 
-## 6. Social Login (OAuth 2.0 Integration)
+## 6. Email Service & Communication
+- **Resend Integration**: Migrated from Nodemailer to modern Resend REST API for faster, more reliable email delivery.
+- **Modular Template Architecture**: Implemented a highly scalable `src/common/templates/` folder structure, grouping templates by domain (`emails/`, `sms/`, `pages/`, `webhooks/`).
+- **Transactional Auth Emails**: Successfully integrated HTML email templates for:
+  - Welcome Email (on verification & Google Signup).
+  - Password Reset Link.
+  - Password Changed Security Alert.
+  - Developer App Registered Notification.
+
+## 7. Social Login (OAuth 2.0 Integration)
 - **Provider Architecture** (`GET /providers/:provider`, `GET /providers/:provider/callback`): Implemented a highly scalable Strategy Pattern for third-party logins. Adding a new provider (e.g., GitHub, Facebook) only requires creating a single provider file without modifying routes or controllers.
 - **Google Sign-In**: Fully integrated Google OAuth 2.0. Handles `access_type=offline`, account selection, and cryptographically verifies the `id_token` using Google's JWKS.
-- **Account Linking**: Automatically merges Social Logins with existing email/password accounts if the email matches, or creates a passwordless account for new users.
+- **Account Linking & Welcome Flow**: Automatically merges Social Logins with existing email/password accounts if the email matches, or creates a passwordless account for new users and triggers a Welcome Email.

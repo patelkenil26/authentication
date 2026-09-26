@@ -37,7 +37,12 @@ The following advanced features are tracked for future phases to evolve ChaiAuth
 - **Admin Console & Analytics**: A comprehensive dashboard showing MAU (Monthly Active Users), login failures, audit logs, and security events.
 - **Management API & Webhooks**: Programmatic access to manage users/clients and real-time events (e.g., `user.created`) to sync data with third-party apps.
 
-## 5. Code Quality & Refactoring Roadmap (Strict Audit Findings)
+## 5. Phase 3: SDKs & Client Libraries (The "Clerk" Experience)
+To provide the ultimate developer experience, we will eventually build and publish custom NPM packages to make integration as seamless as 1-2 lines of code.
+- **`@chaiauth/react` & `@chaiauth/nextjs`**: React wrappers providing pre-built components like `<SignIn />`, `<UserButton />`, and `<ChaiAuthProvider />`.
+- **`@chaiauth/node`**: A backend SDK for verifying tokens and interacting with the Management API seamlessly.
+
+## 6. Code Quality & Refactoring Roadmap (Strict Audit Findings)
 To elevate this codebase from "Great" to "Flawless Enterprise Grade", the following architectural refactors should be implemented (ordered from easiest to hardest):
 - **Cross-Module Boundaries Enforcement**: Configure strict ESLint rules (like `no-restricted-imports`) to programmatically ensure that domains (e.g., `/auth` and `/oidc`) do not bypass interfaces and access each other's databases directly.
 - **Dependency Injection (DI)**: Refactor services to accept their dependencies (like the database instance) via constructors using a DI Container (e.g., Awilix). This decouples the code and makes isolated Unit Testing much easier.

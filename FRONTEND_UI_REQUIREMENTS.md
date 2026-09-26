@@ -77,22 +77,30 @@ This document outlines the exact pages and UI components required for a highly s
   - A sleek, non-intimidating error illustration.
   - **Smart Recovery**: Don't just show an error. Automatically show an input field pre-filled with their email and a "Send New Magic Link" button so they don't hit a dead end.
 
-### 7. API Documentation Page (`/docs`)
+### 7. Global Error Page (`/404` & `/error`)
+*A sleek fallback page for invalid links or server errors.*
+- **Layout**: Centered content with a premium, slightly technical illustration (e.g., a disconnected wire or a floating astronaut).
+- **Header**: "Oops! Something went wrong." or "Page Not Found".
+- **Actions**: A primary button "Return to Homepage" or "Go to Dashboard".
+
+### 8. API Documentation Page (`/docs`)
 *A beautiful docs page for developers integrating this Auth system. (No backend needed)*
 - **Layout**: Sidebar with navigation links, main content area with code snippets.
 - **Sections**: "Getting Started", "OAuth 2.0 Flow", "Endpoints".
 - **Code Blocks**: Syntax-highlighted code snippets for cURL, Node.js, etc., explaining how to call `/o/authorize` and `/o/token`.
+
+### 9. Developer Portal / App Registration (`/developer`)
+*A dedicated dashboard for developers to create and manage their OIDC OAuth apps.*
+- **Header**: "Developer Console - Manage Apps".
+- **My Apps List**: A clean grid or table showing all apps registered by the logged-in developer.
+- **Register Form**: Input for `App Name` and `Redirect URIs` to register a new client.
+- **Credentials Modal**: Secure UI showing the generated `Client ID` and `Client Secret` with a one-time "Copy" button.
 
 ---
 
 ## 🚀 Phase 2: Future UI Roadmap (Backend Pending)
 *These screens are for future advanced features. Their backend APIs have not been written yet.*
 
-### 8. Developer Portal / App Registration (`/developer`)
-*Where third-party developers register their apps to get API keys.*
-- **Header**: "Developer Settings" or "Register New Client".
-- **Form**: Input for `App Name` and `Redirect URIs`.
-- **Credentials View**: Secure UI showing generated `Client ID` and `Client Secret`.
 
 ### 9. Admin Console (`/admin/users`)
 *For the super-admins to manage the platform (Auth0 style user-management).*
